@@ -8,7 +8,6 @@ const app = express();
 dotenv.config();
 
 
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
