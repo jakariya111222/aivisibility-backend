@@ -14,6 +14,24 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://aivisibilityagency.net",
+  "https://www.aivisibilityagency.net",
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
