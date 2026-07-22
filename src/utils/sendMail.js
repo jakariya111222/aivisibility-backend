@@ -1,58 +1,42 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: false, // Port 587
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 
-const sendMail = async ({
-  name,
-  company,
-  email,
-  phone,
-  website,
-  country,
-  service,
-  packageName,
-  meetingDate,
-  meetingTime,
-  message,
-}) => {
-  const today = new Date().toLocaleString();
+const sendMail = async (data) => {
+  console.log("SMTP_HOST:", process.env.SMTP_HOST);
+  console.log("SMTP_PORT:", process.env.SMTP_PORT);
+  console.log("SMTP_USER:", process.env.SMTP_USER);
+  console.log("SMTP_PASS exists:", !!process.env.SMTP_PASS);
 
-  await transporter.sendMail({
-    from: `"AI Visibility Agency" <${process.env.MAIL_FROM}>`,
-    to: process.env.MAIL_TO,
-    replyTo: email,
-    subject: `🚀 New ${service} Order - ${packageName}`,
-    html: `
-      <h2>New Order Received</h2>
+  try {
+    console.log("Verifying SMTP...");
+    await transporter.verify();
+    console.log("SMTP VERIFIED ✅");
 
-      <p><strong>Date:</strong> ${today}</p>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>Company:</strong> ${company || "-"}</p>
-      <p><strong>Website:</strong> ${website || "-"}</p>
-      <p><strong>Country:</strong> ${country || "-"}</p>
-      <p><strong>Service:</strong> ${service}</p>
-      <p><strong>Package:</strong> ${packageName}</p>
-      <p><strong>Meeting Date:</strong> ${meetingDate || "-"}</p>
-      <p><strong>Meeting Time:</strong> ${meetingTime || "-"}</p>
+    const info = await transporter.sendMail({
+      from: `"AI Visibility Agency" <${process.env.MAIL_FROM}>`,
+      to: process.env.MAIL_TO,
+      replyTo: data.email,
+      subject: "Test",
+      html: "<h1>Test</h1>",
+    });
 
-      <hr />
-
-      <p>${message || "-"}</p>
-    `,
-  });
+    console.log("MAIL SENT:", info);
+  } catch (err) {
+    console.error("SMTP ERROR:", err);
+    throw err;
+  }
 };
-
 export default sendMail;
