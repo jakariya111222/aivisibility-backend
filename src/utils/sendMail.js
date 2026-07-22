@@ -11,8 +11,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
-await transporter.verify();
-console.log("SMTP Connected");
+
 
 
 const sendMail = async ({
